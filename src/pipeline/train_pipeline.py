@@ -10,7 +10,12 @@ This script demonstrates the complete workflow:
 """
 
 import logging
-import mlflow
+import sys
+from pathlib import Path
+
+# Add project root to path
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
 
 from src.components.data_ingestion import DataIngestion
 from src.components.data_preprocessing import DataPreprocessing
@@ -24,7 +29,41 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-mlflow.set_experiment("credit-risk-scorer")
+
+def initialize_mlflow(config_path: str = "config/config.yaml"):
+    """
+    Initialize MLflow for experiment tracking.
+    
+    Args:
+        config_path: Path to configuration file
+        
+    Returns:
+        dict: MLflow configuration
+    """
+    import yaml
+    try:
+        # Load config
+        config_path = Path(config_path)
+        if not config_path.is_absolute():
+            project_root = Path.cwd()
+            config_path = project_root / config_path
+        
+        with open(config_path, 'r') as f:
+            config = yaml.safe_load(f)
+        
+        mlflow_config = config.get('mlflow', {})
+        
+        # Set experiment name
+        experiment_name = mlflow_config.get('experiment_name', 'credit_risk_model')
+        import mlflow
+        mlflow.set_experiment(experiment_name)
+        
+        logger.info(f"✓ MLflow initialized with experiment: {experiment_name}")
+        return mlflow_config
+    except Exception as e:
+        logger.warning(f"MLflow initialization failed: {e}. Continuing without MLflow tracking.")
+        return {}
+
 
 def main():
     """Execute complete credit risk model training pipeline with MLflow tracking."""
@@ -34,26 +73,27 @@ def main():
     logger.info("=" * 80)
     
     try:
-        logger.info("\nInitializing MLflow...")
+        logger.info("\n[STEP 1/5] Initializing MLflow...")
+        mlflow_config = initialize_mlflow(config_path="config/config.yaml")
         
-        logger.info("\nLoading and ingesting data...")
+        logger.info("\n[STEP 2/5] Loading and ingesting data...")
         data_ingestion = DataIngestion(data_path="data/raw/synthetic_credit_risk.csv")
         df = data_ingestion.load_data()
         df = data_ingestion.validate_data(df)
         
-        logger.info("\nPreprocessing data...")
+        logger.info("\n[STEP 3/5] Preprocessing data...")
         preprocessor = DataPreprocessing(config_path="config/schema.yaml")
         X_train, X_test, y_train, y_test = preprocessor.preprocess(df)
         preprocessor.save_preprocessor()
         preprocessor.save_transformed_data(X_train, X_test, y_train, y_test)
         
-        logger.info("\nTraining models...")
+        logger.info("\n[STEP 4/5] Training models...")
         trainer = ModelTrainer(config_path="config/config.yaml")
         
         models = trainer.initiate_models()
         trained_models = trainer.train_models(models, X_train, y_train)
         
-        logger.info("\nEvaluating models and logging to MLflow...")
+        logger.info("\n[STEP 5/5] Evaluating models and logging to MLflow...")
         best_model, best_model_name, metrics_df = run_model_evaluation_pipeline(
             models=trained_models,
             X_test=X_test,
@@ -63,13 +103,13 @@ def main():
         )
         
         logger.info("\n" + "=" * 80)
-        logger.info("PIPELINE COMPLETED SUCCESSFULLY!")
+        logger.info("✓ PIPELINE COMPLETED SUCCESSFULLY!")
         logger.info("=" * 80)
         logger.info(f"\nBest Model: {best_model_name}")
         logger.info(f"\nMetrics Summary:\n{metrics_df.to_string(index=False)}")
-        logger.info("\nModel artifacts saved to: artifacts/models/best_model.pkl")
-        logger.info("Metrics report saved to: artifacts/reports/model_evaluation_metrics.csv")
-        logger.info("All runs logged to MLflow!")
+        logger.info("\n✓ Model artifacts saved to: artifacts/models/best_model.pkl")
+        logger.info("✓ Metrics report saved to: artifacts/reports/model_evaluation_metrics.csv")
+        logger.info("✓ All runs logged to MLflow!")
         
         return best_model, best_model_name, metrics_df
     

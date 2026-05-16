@@ -64,7 +64,15 @@ class DataPreprocessing:
         
         Returns:
             ColumnTransformer: Fitted preprocessor
+            
+        Raises:
+            ValueError: If numerical or categorical columns are not defined
         """
+        if not self.numerical_columns:
+            raise ValueError("No numerical columns defined in schema")
+        if not self.categorical_columns:
+            raise ValueError("No categorical columns defined in schema")
+        
         numeric_pipeline = Pipeline(steps=[
             ('imputer', SimpleImputer(strategy='median')),
             ('scaler', StandardScaler())
@@ -99,6 +107,10 @@ class DataPreprocessing:
             
         Returns:
             Tuple: (X_train, X_test, y_train, y_test) as numpy arrays
+            
+        Raises:
+            ValueError: If target column not found in dataframe
+            Exception: If preprocessing fails
         """
         logger.info("=" * 60)
         logger.info("Starting Data Preprocessing Pipeline")
@@ -106,6 +118,9 @@ class DataPreprocessing:
         
         # Step 1: Split X and y
         logger.info("\n[1/4] Splitting features and target...")
+        if self.target_column not in df.columns:
+            raise ValueError(f"Target column '{self.target_column}' not found in dataframe")
+        
         X = df.drop(columns=[self.target_column])
         y = df[self.target_column]
         logger.info(f"X shape: {X.shape}, y shape: {y.shape}")
@@ -113,26 +128,41 @@ class DataPreprocessing:
         
         # Step 2: Stratified train-test split
         logger.info("\n[2/4] Performing stratified train-test split...")
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y,
-            test_size=self.test_size,
-            random_state=self.random_state,
-            stratify=y
-        )
+        try:
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y,
+                test_size=self.test_size,
+                random_state=self.random_state,
+                stratify=y
+            )
+        except Exception as e:
+            logger.error(f"Error during train-test split: {e}")
+            raise
+        
         logger.info(f"Train set: {X_train.shape[0]} samples, Test set: {X_test.shape[0]} samples")
         logger.info(f"Train target distribution: {y_train.value_counts().to_dict()}")
         logger.info(f"Test target distribution: {y_test.value_counts().to_dict()}")
         
         # Step 3: Create and fit preprocessor on train data
         logger.info("\n[3/4] Creating and fitting preprocessor on training data...")
-        self.preprocessor = self._create_preprocessor()
-        X_train_transformed = self.preprocessor.fit_transform(X_train)
+        try:
+            self.preprocessor = self._create_preprocessor()
+            X_train_transformed = self.preprocessor.fit_transform(X_train)
+        except Exception as e:
+            logger.error(f"Error creating/fitting preprocessor: {e}")
+            raise
+        
         logger.info(f"Preprocessor fitted on train data")
         logger.info(f"Transformed shape: {X_train_transformed.shape}")
         
         # Step 4: Transform test data (using fitted preprocessor)
         logger.info("\n[4/4] Transforming test data...")
-        X_test_transformed = self.preprocessor.transform(X_test)
+        try:
+            X_test_transformed = self.preprocessor.transform(X_test)
+        except Exception as e:
+            logger.error(f"Error transforming test data: {e}")
+            raise
+        
         logger.info(f"Test data transformed")
         logger.info(f"Transformed shape: {X_test_transformed.shape}")
         
