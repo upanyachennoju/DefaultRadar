@@ -31,30 +31,11 @@ class ModelTrainer:
         Args:
             config_path: Path to configuration file with model hyperparameters
         """
-        self.config_path = self._resolve_path(config_path)
+        self.config_path = config_path
         self.config = self._load_config()
         self.random_state = self.config['training']['random_state']
         self.model_params = {}
         
-    def _resolve_path(self, path: str) -> Path:
-        """Resolve relative paths to absolute paths."""
-        path = Path(path)
-        
-        if path.is_absolute() and path.exists():
-            return path
-        
-        current = Path.cwd()
-        while current != current.parent:
-            if (current / "config").exists():
-                resolved = current / path
-                if resolved.exists():
-                    return resolved
-            current = current.parent
-        
-        if Path(path).exists():
-            return Path(path).resolve()
-        
-        raise FileNotFoundError(f"Config file not found: {path}")
     
     def _load_config(self) -> Dict[str, Any]:
         """Load configuration from YAML file."""
@@ -161,7 +142,4 @@ class ModelTrainer:
             logger.error(f"✗ Error in train_models: {e}")
             raise
 
-
-if __name__ == "__main__":
-    pass
         

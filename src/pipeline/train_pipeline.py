@@ -10,11 +10,7 @@ This script demonstrates the complete workflow:
 """
 
 import logging
-import sys
-from pathlib import Path
-
-# Add project to path
-sys.path.insert(0, str(Path(__file__).parent))
+import mlflow
 
 from src.components.data_ingestion import DataIngestion
 from src.components.data_preprocessing import DataPreprocessing
@@ -28,6 +24,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+mlflow.set_experiment("credit-risk-scorer")
 
 def main():
     """Execute complete credit risk model training pipeline with MLflow tracking."""
@@ -37,27 +34,26 @@ def main():
     logger.info("=" * 80)
     
     try:
-        logger.info("\n[STEP 1/5] Initializing MLflow...")
-        mlflow_config = initialize_mlflow(config_path="config/config.yaml")
+        logger.info("\nInitializing MLflow...")
         
-        logger.info("\n[STEP 2/5] Loading and ingesting data...")
+        logger.info("\nLoading and ingesting data...")
         data_ingestion = DataIngestion(data_path="data/raw/synthetic_credit_risk.csv")
         df = data_ingestion.load_data()
         df = data_ingestion.validate_data(df)
         
-        logger.info("\n[STEP 3/5] Preprocessing data...")
+        logger.info("\nPreprocessing data...")
         preprocessor = DataPreprocessing(config_path="config/schema.yaml")
         X_train, X_test, y_train, y_test = preprocessor.preprocess(df)
         preprocessor.save_preprocessor()
         preprocessor.save_transformed_data(X_train, X_test, y_train, y_test)
         
-        logger.info("\n[STEP 4/5] Training models...")
+        logger.info("\nTraining models...")
         trainer = ModelTrainer(config_path="config/config.yaml")
         
         models = trainer.initiate_models()
         trained_models = trainer.train_models(models, X_train, y_train)
         
-        logger.info("\n[STEP 5/5] Evaluating models and logging to MLflow...")
+        logger.info("\nEvaluating models and logging to MLflow...")
         best_model, best_model_name, metrics_df = run_model_evaluation_pipeline(
             models=trained_models,
             X_test=X_test,
@@ -67,13 +63,13 @@ def main():
         )
         
         logger.info("\n" + "=" * 80)
-        logger.info("✓ PIPELINE COMPLETED SUCCESSFULLY!")
+        logger.info("PIPELINE COMPLETED SUCCESSFULLY!")
         logger.info("=" * 80)
         logger.info(f"\nBest Model: {best_model_name}")
         logger.info(f"\nMetrics Summary:\n{metrics_df.to_string(index=False)}")
-        logger.info("\n✓ Model artifacts saved to: artifacts/models/best_model.pkl")
-        logger.info("✓ Metrics report saved to: artifacts/reports/model_evaluation_metrics.csv")
-        logger.info("✓ All runs logged to MLflow!")
+        logger.info("\nModel artifacts saved to: artifacts/models/best_model.pkl")
+        logger.info("Metrics report saved to: artifacts/reports/model_evaluation_metrics.csv")
+        logger.info("All runs logged to MLflow!")
         
         return best_model, best_model_name, metrics_df
     

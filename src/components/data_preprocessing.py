@@ -19,7 +19,6 @@ from src.components.data_ingestion import DataIngestion
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-
 class DataPreprocessing:
     """
     Handles data preprocessing including:
@@ -37,7 +36,7 @@ class DataPreprocessing:
             test_size: Proportion of test set (default 0.2)
             random_state: Random seed for reproducibility
         """
-        self.config_path = self._resolve_path(config_path)
+        self.config_path = config_path
         self.test_size = test_size
         self.random_state = random_state
         
@@ -48,27 +47,6 @@ class DataPreprocessing:
         self.target_column = 'target'
         self.preprocessor = None
         
-    def _resolve_path(self, path: str) -> Path:
-        """Resolve relative paths to absolute paths."""
-        path = Path(path)
-        
-        if path.is_absolute() and path.exists():
-            return path
-        
-        # Find project root by looking for 'config' folder
-        current = Path.cwd()
-        while current != current.parent:
-            if (current / "config").exists():
-                resolved = current / path
-                if resolved.exists():
-                    return resolved
-            current = current.parent
-        
-        if Path(path).exists():
-            return Path(path).resolve()
-        
-        raise FileNotFoundError(f"Config file not found: {path}")
-    
     def _load_schema(self) -> Dict[str, Any]:
         """Load schema configuration from YAML file."""
         try:
@@ -108,7 +86,7 @@ class DataPreprocessing:
         logger.info("✓ Preprocessor (ColumnTransformer) created")
         return preprocessor
     
-    def preprocess(self, df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def preprocess(self, df: pd.DataFrame):
         """
         Full preprocessing pipeline:
         1. Split X and y
@@ -225,8 +203,7 @@ def run_preprocessing_pipeline(
     config_path: str = "config/schema.yaml",
     test_size: float = 0.2,
     preprocessor_output_dir: str = "artifacts/preprocessors",
-    data_output_dir: str = "artifacts/transformed_data"
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    data_output_dir: str = "artifacts/transformed_data"):
     """
     Execute the complete preprocessing pipeline.
     
@@ -253,8 +230,7 @@ def run_preprocessing_pipeline(
     preprocessor.save_preprocessor(preprocessor_output_dir)
     preprocessor.save_transformed_data(X_train, X_test, y_train, y_test, data_output_dir)
     
-    logger.info("\n🎯 Preprocessing pipeline completed successfully!")
-    logger.info(f"   Model-ready arrays ready for training")
+    logger.info("\nPreprocessing pipeline completed successfully!")
+    logger.info(f"Model-ready arrays ready for training")
     
     return X_train, X_test, y_train, y_test
-
