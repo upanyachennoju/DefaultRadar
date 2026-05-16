@@ -218,30 +218,45 @@ class ModelEvaluator:
             X_test: Test features
             y_test: Test target
             model_params: Dictionary of model parameters for logging
+            
+        Raises:
+            ValueError: If models dictionary is empty
+            KeyError: If model not found in config
         """
         logger.info("\n" + "=" * 60)
         logger.info("Model Evaluation Pipeline")
         logger.info("=" * 60)
         
+        if not models:
+            raise ValueError("No models provided for evaluation")
+        
         for model_name, model in models.items():
-            # Get threshold from config
-            threshold = self.config['models'][model_name].get('threshold')
-            
-            # Evaluate model
-            results = self.evaluate_model(
-                model, X_test, y_test, model_name, threshold
-            )
-            
-            self.evaluation_results[model_name] = results
-            
-            # Log to MLflow
-            if model_params and model_name in model_params:
-                self.log_to_mlflow(
-                    model_name,
-                    results,
-                    model_params[model_name],
-                    model
+            try:
+                # Get threshold from config
+                if model_name not in self.config.get('models', {}):
+                    logger.warning(f"Model '{model_name}' not found in config, using default threshold")
+                    threshold = None
+                else:
+                    threshold = self.config['models'][model_name].get('threshold')
+                
+                # Evaluate model
+                results = self.evaluate_model(
+                    model, X_test, y_test, model_name, threshold
                 )
+                
+                self.evaluation_results[model_name] = results
+                
+                # Log to MLflow
+                if model_params and model_name in model_params:
+                    self.log_to_mlflow(
+                        model_name,
+                        results,
+                        model_params[model_name],
+                        model
+                    )
+            except Exception as e:
+                logger.error(f"Error evaluating {model_name}: {e}")
+                raise
     
     def compare_models(self) -> pd.DataFrame:
         """

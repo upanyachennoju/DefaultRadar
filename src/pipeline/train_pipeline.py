@@ -13,8 +13,9 @@ import logging
 import sys
 from pathlib import Path
 
-# Add project to path
-sys.path.insert(0, str(Path(__file__).parent))
+# Add project root to path
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
 
 from src.components.data_ingestion import DataIngestion
 from src.components.data_preprocessing import DataPreprocessing
@@ -27,6 +28,41 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+
+def initialize_mlflow(config_path: str = "config/config.yaml"):
+    """
+    Initialize MLflow for experiment tracking.
+    
+    Args:
+        config_path: Path to configuration file
+        
+    Returns:
+        dict: MLflow configuration
+    """
+    import yaml
+    try:
+        # Load config
+        config_path = Path(config_path)
+        if not config_path.is_absolute():
+            project_root = Path.cwd()
+            config_path = project_root / config_path
+        
+        with open(config_path, 'r') as f:
+            config = yaml.safe_load(f)
+        
+        mlflow_config = config.get('mlflow', {})
+        
+        # Set experiment name
+        experiment_name = mlflow_config.get('experiment_name', 'credit_risk_model')
+        import mlflow
+        mlflow.set_experiment(experiment_name)
+        
+        logger.info(f"✓ MLflow initialized with experiment: {experiment_name}")
+        return mlflow_config
+    except Exception as e:
+        logger.warning(f"MLflow initialization failed: {e}. Continuing without MLflow tracking.")
+        return {}
 
 
 def main():
