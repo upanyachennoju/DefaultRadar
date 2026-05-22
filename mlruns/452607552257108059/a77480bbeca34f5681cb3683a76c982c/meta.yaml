@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/upanyachennoju/GitHub/credit-risk-system/mlruns/452607552257108059/a77480bbeca34f5681cb3683a76c982c/artifacts
+end_time: 1778906856084
+entry_point_name: ''
+experiment_id: '452607552257108059'
+lifecycle_stage: active
+run_id: a77480bbeca34f5681cb3683a76c982c
+run_name: xgboost
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1778906853616
+status: 3
+tags: []
+user_id: upanyachennoju

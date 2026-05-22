@@ -1,0 +1,10 @@
+artifact_location: file:///Users/upanyachennoju/GitHub/credit-risk-system/mlruns/452607552257108059/models/m-22ffb9b6b75b4bd597d8941a6945e184/artifacts
+creation_timestamp: 1778906850958
+experiment_id: '452607552257108059'
+last_updated_timestamp: 1778906853599
+model_id: m-22ffb9b6b75b4bd597d8941a6945e184
+model_type: null
+name: model
+source_run_id: 6e2c539258754f7d8b292da77084bec2
+status: 2
+status_message: null

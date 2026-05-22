@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/upanyachennoju/GitHub/credit-risk-system/mlruns/452607552257108059/48c69da4a35348fc88cc406262c2d2ae/artifacts
+end_time: 1779355293722
+entry_point_name: ''
+experiment_id: '452607552257108059'
+lifecycle_stage: active
+run_id: 48c69da4a35348fc88cc406262c2d2ae
+run_name: random_forest
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779355290943
+status: 3
+tags: []
+user_id: upanyachennoju

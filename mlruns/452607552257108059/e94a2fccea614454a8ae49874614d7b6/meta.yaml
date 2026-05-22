@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/upanyachennoju/GitHub/credit-risk-system/mlruns/452607552257108059/e94a2fccea614454a8ae49874614d7b6/artifacts
+end_time: 1779355290910
+entry_point_name: ''
+experiment_id: '452607552257108059'
+lifecycle_stage: active
+run_id: e94a2fccea614454a8ae49874614d7b6
+run_name: logistic_regression
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779355287365
+status: 3
+tags: []
+user_id: upanyachennoju
