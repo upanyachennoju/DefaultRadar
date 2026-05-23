@@ -1,11 +1,11 @@
 from pathlib import Path
 from typing import Literal
-
+import numpy as np
 import pandas as pd
 import pickle
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-
+import shap
 
 MODEL_PATH = Path("artifacts/models/best_model.pkl")
 PREPROCESSOR_PATH = Path("artifacts/preprocessors/preprocessing.pkl")
@@ -29,10 +29,12 @@ class CreditRiskRequest(BaseModel):
     internal_score_v2: float
 
 
+
 class PredictionResponse(BaseModel):
     default_probability: float
     prediction: int
     risk_tier: Literal["low", "medium", "high"]
+    explainability: dict
 
 
 def _load_pickle(path: Path):
@@ -55,6 +57,8 @@ except Exception as exc:
 else:
     startup_error = None
 
+X_background = np.load("artifacts/transformed_data/X_train.npy")[:100]
+explainer = shap.LinearExplainer(model, X_background)
 
 def _map_risk_tier(probability: float) -> str:
     if probability < 0.3:
@@ -82,6 +86,12 @@ def predict(payload: CreditRiskRequest):
     try:
         input_df = pd.DataFrame([payload.model_dump()])
         features = preprocessor.transform(input_df)
+        shap_values = explainer(features)
+
+        feature_names = input_df.columns.tolist()
+        explainability = {
+            feature_names[i]: float(shap_values.values[0][i]) for i in range(len(feature_names))
+        }
 
         if not hasattr(model, "predict_proba"):
             raise AttributeError("Loaded model does not implement predict_proba")
@@ -94,6 +104,7 @@ def predict(payload: CreditRiskRequest):
             default_probability=probability,
             prediction=prediction,
             risk_tier=risk_tier,
+            explainability=explainability
         )
     except HTTPException:
         raise
