@@ -58,7 +58,7 @@ def initialize_mlflow(config_path: str = "config/config.yaml"):
         import mlflow
         mlflow.set_experiment(experiment_name)
         
-        logger.info(f"✓ MLflow initialized with experiment: {experiment_name}")
+        logger.info(f" MLflow initialized with experiment: {experiment_name}")
         return mlflow_config
     except Exception as e:
         logger.warning(f"MLflow initialization failed: {e}. Continuing without MLflow tracking.")
@@ -103,13 +103,13 @@ def main():
         )
         
         logger.info("\n" + "=" * 80)
-        logger.info("✓ PIPELINE COMPLETED SUCCESSFULLY!")
+        logger.info(" PIPELINE COMPLETED SUCCESSFULLY!")
         logger.info("=" * 80)
         logger.info(f"\nBest Model: {best_model_name}")
         logger.info(f"\nMetrics Summary:\n{metrics_df.to_string(index=False)}")
-        logger.info("\n✓ Model artifacts saved to: artifacts/models/best_model.pkl")
-        logger.info("✓ Metrics report saved to: artifacts/reports/model_evaluation_metrics.csv")
-        logger.info("✓ All runs logged to MLflow!")
+        logger.info("\n Model artifacts saved to: artifacts/models/best_model.pkl")
+        logger.info(" Metrics report saved to: artifacts/reports/model_evaluation_metrics.csv")
+        logger.info(" All runs logged to MLflow!")
         
         return best_model, best_model_name, metrics_df
     

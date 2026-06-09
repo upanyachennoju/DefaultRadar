@@ -42,7 +42,7 @@ class ModelTrainer:
         try:
             with open(self.config_path, 'r') as f:
                 config = yaml.safe_load(f)
-            logger.info(f"✓ Configuration loaded from {self.config_path}")
+            logger.info(f" Configuration loaded from {self.config_path}")
             return config
         except Exception as e:
             logger.error(f"✗ Error loading config: {e}")
@@ -66,21 +66,21 @@ class ModelTrainer:
             lr_params = self.config['models']['logistic_regression']['best_params']
             models['logistic_regression'] = LogisticRegression(**lr_params)
             self.model_params['logistic_regression'] = lr_params
-            logger.info("✓ Logistic Regression initialized")
+            logger.info(" Logistic Regression initialized")
             
             # Random Forest
             rf_params = self.config['models']['random_forest']['best_params']
             models['random_forest'] = RandomForestClassifier(**rf_params)
             self.model_params['random_forest'] = rf_params
-            logger.info("✓ Random Forest initialized")
+            logger.info(" Random Forest initialized")
             
             # XGBoost
             xgb_params = self.config['models']['xgboost']['best_params'].copy()
             models['xgboost'] = XGBClassifier(**xgb_params)
             self.model_params['xgboost'] = xgb_params
-            logger.info("✓ XGBoost initialized")
+            logger.info(" XGBoost initialized")
             
-            logger.info("✓ All models initiated successfully\n")
+            logger.info(" All models initiated successfully\n")
             return models
         
         except Exception as e:
@@ -129,13 +129,13 @@ class ModelTrainer:
                 try:
                     model.fit(X_train, y_train)
                     trained_models[model_name] = model
-                    logger.info(f"✓ {model_name} trained successfully")
+                    logger.info(f" {model_name} trained successfully")
                 
                 except Exception as e:
                     logger.error(f"✗ Error training {model_name}: {e}")
                     raise
             
-            logger.info("\n✓ All models trained successfully\n")
+            logger.info("\n All models trained successfully\n")
             return trained_models
         
         except Exception as e:

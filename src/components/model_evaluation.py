@@ -146,13 +146,13 @@ class ModelEvaluator:
                 'y_proba': y_proba
             }
             
-            logger.info(f"  ✓ Precision:         {precision:.4f}")
-            logger.info(f"  ✓ Recall:            {recall:.4f}")
-            logger.info(f"  ✓ F1-Score:          {f1:.4f}")
-            logger.info(f"  ✓ ROC-AUC:           {roc_auc:.4f}")
-            logger.info(f"  ✓ PR-AUC:            {pr_auc:.4f}")
-            logger.info(f"  ✓ Specificity:       {specificity:.4f}")
-            logger.info(f"  ✓ Balanced Accuracy: {balanced_accuracy:.4f}")
+            logger.info(f"   Precision:         {precision:.4f}")
+            logger.info(f"   Recall:            {recall:.4f}")
+            logger.info(f"   F1-Score:          {f1:.4f}")
+            logger.info(f"   ROC-AUC:           {roc_auc:.4f}")
+            logger.info(f"   PR-AUC:            {pr_auc:.4f}")
+            logger.info(f"   Specificity:       {specificity:.4f}")
+            logger.info(f"   Balanced Accuracy: {balanced_accuracy:.4f}")
             
             return results
         
@@ -312,7 +312,7 @@ class ModelEvaluator:
                 self.best_model = models[model_name]
                 self.best_metrics = results
         
-        logger.info(f"\n✓ Best Model: {self.best_model_name}")
+        logger.info(f"\n Best Model: {self.best_model_name}")
         logger.info(f"  F1-Score: {best_f1:.4f}")
         logger.info(f"  Precision: {self.best_metrics['precision']:.4f}")
         logger.info(f"  Recall: {self.best_metrics['recall']:.4f}")
@@ -339,7 +339,7 @@ class ModelEvaluator:
             with open(model_file, 'wb') as f:
                 pickle.dump(self.best_model, f)
             
-            logger.info(f"\n✓ Best model saved to {model_file}")
+            logger.info(f"\n Best model saved to {model_file}")
             logger.info(f"  Model: {self.best_model_name}")
             logger.info(f"  F1-Score: {self.best_metrics['f1']:.4f}")
             
@@ -392,7 +392,7 @@ def run_model_evaluation_pipeline(
     report_path = Path(report_output_dir) / "model_evaluation_metrics.csv"
     report_path.parent.mkdir(parents=True, exist_ok=True)
     metrics_df.to_csv(report_path, index=False)
-    logger.info(f"✓ Metrics report saved to {report_path}")
+    logger.info(f" Metrics report saved to {report_path}")
     
     logger.info("\n" + "=" * 60)
     logger.info("Model evaluation pipeline completed successfully!")

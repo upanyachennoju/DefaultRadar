@@ -103,9 +103,9 @@ class DataIngestion:
         
         # Check duplicates
         duplicates = df.duplicated().sum()
-        logger.info(f"  Duplicate rows found: {duplicates}")
+        logger.info(f"Duplicate rows found: {duplicates}")
         if duplicates > 0:
-            logger.warning(f"  Warning: {duplicates} duplicate rows detected")
+            logger.warning(f"Warning: {duplicates} duplicate rows detected")
         
         # Check missing values
         missing = df.isnull().sum()
@@ -141,7 +141,7 @@ class DataIngestion:
         
         try:
             df.to_csv(output_path, index=False)
-            logger.info(f"✓ Validated data saved to {output_path}")
+            logger.info(f" Validated data saved to {output_path}")
             logger.info(f"  Saved {df.shape[0]} rows x {df.shape[1]} columns")
             return output_path
         except Exception as e:

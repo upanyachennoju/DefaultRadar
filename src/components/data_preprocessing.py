@@ -113,7 +113,7 @@ class DataPreprocessing:
             ]
         )
         
-        logger.info("✓ Preprocessor (ColumnTransformer) created")
+        logger.info("Preprocessor (ColumnTransformer) created")
         return preprocessor
     
     def preprocess(self, df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -210,7 +210,7 @@ class DataPreprocessing:
         try:
             with open(preprocessor_file, 'wb') as f:
                 pickle.dump(self.preprocessor, f)
-            logger.info(f"✓ Preprocessor saved to {preprocessor_file}")
+            logger.info(f" Preprocessor saved to {preprocessor_file}")
         except Exception as e:
             logger.error(f"✗ Error saving preprocessor: {e}")
             raise
@@ -283,8 +283,8 @@ def run_preprocessing_pipeline(
     preprocessor.save_preprocessor(preprocessor_output_dir)
     preprocessor.save_transformed_data(X_train, X_test, y_train, y_test, data_output_dir)
     
-    logger.info("\n🎯 Preprocessing pipeline completed successfully!")
-    logger.info(f"   Model-ready arrays ready for training")
+    logger.info("\nPreprocessing pipeline completed successfully!")
+    logger.info(f"Model-ready arrays ready for training")
     
     return X_train, X_test, y_train, y_test
 
